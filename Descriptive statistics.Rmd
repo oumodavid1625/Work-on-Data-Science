@@ -1,0 +1,381 @@
+---
+title: "DESCRIPTIVE STATISTICS"
+author: "Oumo David"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+This is a tutorial on Descriptive statistics.
+Descriptive statistics summarize and organize characteristics of a dataset, providing insights into its distribution, central tendency, and variability. 
+R offers various built-in functions and packages to perform descriptive statistics efficiently. In this tutorial, we will explore different methods to compute descriptive statistics in R.
+
+# 1. Getting Started with R
+
+Before we begin, ensure that R is installed on your system. You can also use RStudio for an enhanced coding experience.
+
+To start, load the required packages:
+If not installed, install the following packages
+
+install.packages("dplyr")
+
+install.packages("psych")
+
+
+Load the necessary packages
+
+```{r}
+library(dplyr)
+
+library(psych)
+
+```
+
+# 2. Creating a Sample Dataset
+
+You can create a sample dataset using R’s built-in data.frame() function:
+Create a sample dataset
+View the dataset
+
+```{r}
+data <- data.frame(
+  ID = 1:10,
+  Age = c(25, 30, 35, 40, 29, 33, 31, 27, 26, 32),
+  Salary = c(40000, 50000, 60000, 70000, 45000, 55000, 52000, 47000, 43000, 51000)
+)
+
+print(data)
+
+```
+
+# 3. Measures of Central Tendency
+
+Central tendency describes the center point of a dataset. Common measures include:
+
+Mean (Average)
+
+```{r}
+mean_age <- mean(data$Age)
+
+mean_salary <- mean(data$Salary)
+
+```
+
+Median (Middle Value)
+
+```{r}
+median_age <- median(data$Age)
+
+median_salary <- median(data$Salary)
+
+```
+
+Mode (Most Frequent Value)
+
+```{r}
+mode_function <- function(x) {
+  uniq_x <- unique(x)
+  uniq_x[which.max(tabulate(match(x, uniq_x)))]
+}
+
+mode_age <- mode_function(data$Age)
+
+```
+
+Display results
+
+- Mean age, Median age, Mode_age
+
+- Mean salary, Median salary
+
+```{r}
+mean_age; median_age; mode_age
+
+mean_salary; median_salary
+
+```
+# 4. Measures of Dispersion
+
+Dispersion indicates how data values spread around the central value.
+
+Standard Deviation
+
+```{r}
+sd_age <- sd(data$Age)
+
+sd_salary <- sd(data$Salary)
+
+```
+
+Variance
+
+```{r}
+var_age <- var(data$Age)
+
+var_salary <- var(data$Salary)
+
+```
+
+Range
+
+```{r}
+range_age <- range(data$Age)
+
+range_salary <- range(data$Salary)
+
+```
+
+Interquartile Range (IQR)
+
+```{r}
+iqr_age <- IQR(data$Age)
+
+iqr_salary <- IQR(data$Salary)
+
+```
+
+
+Display results
+
+- sd_age, var_age, range_age, iqr_age
+
+- sd_salary, var_salary, range_salary, iqr_salary
+
+```{r}
+sd_age; var_age; range_age; iqr_age
+
+sd_salary; var_salary; range_salary; iqr_salary
+
+```
+# 5. Summary Statistics Using Built-in Functions
+
+R provides built-in functions for quick summaries: Summary function
+
+```{r}
+summary(data)
+
+```
+
+# 6. Using psych Package for Enhanced Descriptive Statistics
+
+The describe() function from the psych package provides detailed statistics:
+
+```{r}
+describe(data)
+
+```
+
+# 7. Visualizing Data
+
+Visualizations help understand data distribution.
+
+Histogram
+
+```{r}
+hist(data$Age, main="Age Distribution", xlab="Age", col="blue", breaks=5)
+
+```
+
+Boxplot
+
+```{r}
+boxplot(data$Salary, main="Salary Distribution", ylab="Salary", col="red")
+
+```
+
+Descriptive statistics provide essential insights into datasets before conducting further analysis. R offers various functions and packages to compute these statistics efficiently. By understanding central tendency, dispersion, and visualization techniques, you can effectively summarize and interpret data.
+
+# 8.Descriptive statistics on the mtcars dataset
+
+Now, let us look at the mtcars dataset to explore the descriptive statistics
+
+Load built-in dataset
+Assign it to a variable
+
+```{r}
+data("mtcars")
+
+df <- mtcars
+
+```
+
+# 9. Overview of the Dataset
+To understand the dataset structure.
+
+View first few rows
+
+```{R}
+head(df)
+
+```
+
+Check the structure
+
+```{R}
+str(df)
+
+```
+
+Summary statistics
+
+```{r}
+summary(df)
+
+```
+
+# 10. Measures of Central Tendency
+These include the mean, median, and mode.
+
+Mean
+Mean of miles per gallon
+
+```{r}
+mean(df$mpg)   
+
+```
+
+Median
+Median of miles per gallon
+
+```{r}
+median(df$mpg) 
+
+```
+
+Mode (Custom function, since R has no built-in mode function)
+
+```{r}
+mode_func <- function(x) {
+  uniq_vals <- unique(x)
+  uniq_vals[which.max(tabulate(match(x, uniq_vals)))]
+}
+
+mode_func(df$mpg)
+
+```
+
+# 11. Measures of Dispersion
+These include the range, variance, standard deviation, and interquartile range (IQR).
+
+Range
+
+```{r}
+range(df$mpg)
+
+```
+
+Variance
+
+```{r}
+var(df$mpg)
+
+```
+
+Standard deviation
+
+```{r}
+sd(df$mpg)
+
+```
+
+
+Interquartile Range (IQR)
+
+```{r}
+IQR(df$mpg)
+
+```
+
+# 12. Skewness and Kurtosis
+Skewness measures symmetry, and kurtosis measures the "tailedness" of the distribution.
+
+Load necessary library
+
+```{r}
+library(moments)
+
+```
+
+Skewness
+
+```{r}
+skewness(df$mpg)
+
+```
+
+Kurtosis
+
+```{r}
+kurtosis(df$mpg)
+
+```
+
+# 13. Frequency Distribution (Categorical Data)
+For categorical data, we use tables and proportions.
+
+Convert a numerical variable into a categorical one
+
+```{r}
+df$cyl_factor <- as.factor(df$cyl)
+
+```
+
+Frequency table
+
+```{r}
+table(df$cyl_factor)
+
+```
+
+
+Proportion table
+
+```{r}
+prop.table(table(df$cyl_factor))
+
+```
+
+# 14. Visualizing Data
+Histograms
+
+```{r}
+hist(df$mpg, main="Histogram of MPG", xlab="Miles per Gallon", col="blue")
+
+```
+
+Boxplot
+
+```{r}
+boxplot(df$mpg, main="Boxplot of MPG", ylab="Miles per Gallon", col="red")
+
+```
+
+Bar Chart (for categorical data)
+
+```{r}
+barplot(table(df$cyl_factor), main="Cylinder Count", col="green")
+
+```
+
+# 15. Summary Statistics for Multiple Columns
+Summary statistics for all numerical variables
+
+```{r}
+summary(df)
+
+```
+
+Apply functions across multiple columns
+Mean for all numeric columns
+
+```{r}
+sapply(df[, sapply(df, is.numeric)], mean)
+
+```
+
+# Conclusion
+
+This tutorial introduced key descriptive statistics in R, including measures of central tendency, dispersion, skewness, and visualizations. These techniques help summarize and understand data effectively.

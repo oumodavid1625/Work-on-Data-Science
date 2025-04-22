@@ -1,0 +1,296 @@
+---
+title: "HYPOTHESIS TESTING"
+author: "Oumo David"
+date: "`r Sys.Date()`"
+output: 
+  html_document
+  toc: true
+  toc_float: true
+  code_folding: hide
+---
+
+# Hypothesis Testing Using R
+
+Hypothesis testing is a fundamental statistical technique used to make inferences about population parameters based on sample data. In this tutorial, we will explore how to perform hypothesis testing in R using common statistical tests, such as the t-test, chi-square test, and ANOVA.
+
+# Understanding Hypothesis Testing
+
+Hypothesis testing involves the following steps:
+
+## 1. Formulate Hypotheses:
+
+- Null Hypothesis (H₀): The default assumption (e.g., no effect or no difference).
+
+- Alternative Hypothesis (H₁): The claim we want to test (e.g., there is an effect or difference).
+
+## 2. Choose a Significance Level (α): Commonly set to 0.05 (5%).
+
+## 3. Calculate the Test Statistic: A value computed from the sample data.
+
+## 4. Determine the p-value: The probability of observing the test statistic under the null hypothesis.
+
+## Make a Decision:
+
+- If p-value < α, reject the null hypothesis.
+
+- If p-value ≥ α, fail to reject the null hypothesis.
+
+# Load Required Libraries
+
+For this tutorial, we will use base R functions, so no additional libraries are required. However, we will use the ggplot2 package for visualization:
+
+Install and load ggplot2 (for visualization)
+
+install.packages("ggplot2")
+
+```{R}
+library(ggplot2)
+
+```
+
+# One-Sample t-Test
+
+A one-sample t-test is used to compare the mean of a sample to a known value.
+
+Example:
+
+Suppose we have a sample of 30 students' test scores, and we want to test if the mean score is significantly different from 70.
+
+- Sample data
+
+```{R}
+set.seed(123)
+scores <- rnorm(30, mean = 75, sd = 10)
+
+```
+
+- One-sample t-test
+
+```{R}
+t_test_result <- t.test(scores, mu = 70)
+t_test_result
+
+```
+
+## Interpretation:
+
+- Null Hypothesis (H₀): The mean score is 70.
+
+- Alternative Hypothesis (H₁): The mean score is not 70.
+
+- If the p-value < 0.05, we reject H₀ and conclude that the mean score is significantly different from 70.
+
+Since the p-value (0.01715) is less than the significance level (α = 0.05), we reject the null hypothesis. This means there is sufficient evidence to conclude that the sample mean is significantly different from 70.
+
+Additionally, the 95% confidence interval (70.86573 to 78.19219) does not include the hypothesized mean (70), further supporting the conclusion that the true population mean is not 70.
+
+# Two-Sample t-Test
+
+A two-sample t-test is used to compare the means of two independent groups.
+
+Example:
+
+Suppose we have test scores for two groups of students (Group A and Group B) and want to test if their means are significantly different.
+
+- Sample data
+
+```{r}
+set.seed(123)
+group_a <- rnorm(30, mean = 75, sd = 10)
+group_b <- rnorm(30, mean = 80, sd = 10)
+
+```
+
+- Two-sample t-test
+
+```{r}
+t_test_result <- t.test(group_a, group_b)
+t_test_result
+
+```
+
+## Interpretation:
+
+- Null Hypothesis (H₀): The means of Group A and Group B are equal.
+
+- Alternative Hypothesis (H₁): The means of Group A and Group B are not equal.
+
+- If the p-value < 0.05, we reject H₀ and conclude that the means are significantly different.
+
+Since the p-value (0.003156) is less than the significance level (α = 0.05), we reject the null hypothesis. This means there is sufficient evidence to conclude that the means of the two groups are significantly different.
+
+Additionally, the 95% confidence interval (-11.965426 to -2.543416) does not include zero, further supporting the conclusion that the true difference in means is not zero.
+
+# Paired t-Test
+
+A paired t-test is used to compare the means of two related groups (e.g., before and after measurements).
+
+Example:
+
+Suppose we have blood pressure measurements for 20 patients before and after a treatment.
+
+- Sample data
+
+```{r}
+set.seed(123)
+before <- rnorm(20, mean = 120, sd = 10)
+after <- rnorm(20, mean = 115, sd = 10)
+
+```
+
+- Paired t-test
+
+```{r}
+t_test_result <- t.test(before, after, paired = TRUE)
+t_test_result
+
+```
+
+## Interpretation:
+
+- Null Hypothesis (H₀): The mean difference between before and after measurements is zero.
+
+- Alternative Hypothesis (H₁): The mean difference is not zero.
+
+- If the p-value < 0.05, we reject H₀ and conclude that the treatment had a significant effect.
+
+Since the p-value (0.03159) is less than the significance level (α = 0.05), we reject the null hypothesis. This means there is sufficient evidence to conclude that the mean difference between the paired observations is significantly different from zero.
+
+Additionally, the 95% confidence interval (0.679524 to 13.178095) does not include zero, further supporting the conclusion that the true mean difference is not zero.
+
+# Chi-Square Test
+A chi-square test is used to test the association between categorical variables.
+
+Example:
+
+Suppose we have a contingency table showing the distribution of gender (Male, Female) and preference for a product (Like, Dislike).
+
+- Contingency table
+
+```{r}
+data <- matrix(c(30, 10, 20, 40), nrow = 2, byrow = TRUE)
+rownames(data) <- c("Male", "Female")
+colnames(data) <- c("Like", "Dislike")
+
+```
+
+- Chi-square test
+
+```{r}
+chi_test_result <- chisq.test(data)
+chi_test_result
+
+```
+
+## Interpretation:
+
+- Null Hypothesis (H₀): There is no association between gender and product preference.
+
+- Alternative Hypothesis (H₁): There is an association between gender and product preference.
+
+- If the p-value < 0.05, we reject H₀ and conclude that there is a significant association.
+
+Since the p-value (0.0001052) is less than the significance level (α = 0.05), we reject the null hypothesis. This means there is sufficient evidence to conclude that there is a significant association between the two categorical variables.
+
+# ANOVA (Analysis of Variance)
+
+ANOVA is used to compare the means of three or more groups.
+
+Example:
+
+Suppose we have test scores for three groups of students (Group A, Group B, Group C) and want to test if their means are significantly different.
+
+- Sample data
+
+```{r}
+set.seed(123)
+group_a <- rnorm(30, mean = 75, sd = 10)
+group_b <- rnorm(30, mean = 80, sd = 10)
+group_c <- rnorm(30, mean = 85, sd = 10)
+
+```
+
+- Combine data into a data frame
+
+```{r}
+data <- data.frame(
+    score = c(group_a, group_b, group_c),
+    group = factor(rep(c("A", "B", "C"), each = 30))
+)
+
+```
+
+## ANOVA
+
+```{r}
+anova_result <- aov(score ~ group, data = data)
+summary(anova_result)
+
+```
+
+## Interpretation:
+
+- Null Hypothesis (H₀): The means of all groups are equal.
+
+- Alternative Hypothesis (H₁): At least one group mean is different.
+
+- If the p-value < 0.05, we reject H₀ and conclude that there are significant differences between the groups.
+
+Since the p-value (0.0000494) is less than the significance level (α = 0.05), we reject the null hypothesis. This means there is sufficient evidence to conclude that at least one group mean is significantly different from the others.
+
+# Post-Hoc Analysis (Tukey's HSD)
+
+If ANOVA results are significant, perform post-hoc analysis to identify which groups differ.
+
+# Tukey's HSD test
+
+```{r}
+tukey_result <- TukeyHSD(anova_result)
+tukey_result
+
+```
+
+## Interpretation:
+
+- The output shows pairwise comparisons between groups and their p-values.
+
+- Identify pairs with p-values < 0.05 as significantly different.
+
+Significant Differences:
+
+- B vs. A: There is a statistically significant difference between group B and group A (p < 0.05).
+
+- C vs. A: There is a highly statistically significant difference between group C and group A (p < 0.001).
+
+No Significant Difference:
+
+- C vs. B: There is no statistically significant difference between group C and group B (p > 0.05).
+
+# Visualization
+Visualize the results using boxplots or bar plots.
+
+Boxplot for ANOVA:
+
+```{r}
+ggplot(data, aes(x = group, y = score, fill = group)) +
+    geom_boxplot() +
+    theme_minimal() +
+    labs(title = "Test Scores by Group", x = "Group", y = "Score")
+
+```
+
+# Summary
+
+In this tutorial, we covered:
+
+One-sample t-test: Compare a sample mean to a known value.
+
+Two-sample t-test: Compare means of two independent groups.
+
+Paired t-test: Compare means of two related groups.
+
+Chi-square test: Test association between categorical variables.
+
+ANOVA: Compare means of three or more groups.
+
+Post-hoc analysis: Identify specific group differences after ANOVA.

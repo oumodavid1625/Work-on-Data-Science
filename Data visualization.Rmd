@@ -1,0 +1,704 @@
+---
+title: "DATA VISUALIZATION"
+author: "Oumo David"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+# Data visualization
+
+Data visualization in R is primarily done using base R functions or popular libraries like ggplot2, which is part of the tidyverse package.
+Data visualization transforms raw data into meaningful insights through charts, graphs, and plots. 
+R offers two main methods for visualization:
+
+Base R functions is helpful for Quick and simple visualizations.
+ggplot2 is a powerful library for creating complex and customizable plots.
+
+# Using ggplot2 for Advanced Visualizations
+
+Make sure you have the necessary R packages installed:
+install.packages("ggplot2")    # For data visualization
+install.packages("dplyr")      # For data manipulation
+
+Load the ggplot2 and dplyr libraries
+
+```{r}
+library(ggplot2)
+
+library(dplyr)
+
+```
+
+
+
+# Bar Plot
+
+A bar plot (or bar chart) is a graphical representation of categorical data using rectangular bars where the length or height of each bar corresponds to the data's value or frequency.
+
+## Types of Bar Plots:
+
+- Vertical Bar Plot: Bars are drawn vertically; height represents the value.
+- Horizontal Bar Plot: Bars are drawn horizontally; length represents the value.
+- Stacked Bar Plot: Multiple data series stacked on top of each other in a single bar.
+- Grouped Bar Plot: Bars representing different groups placed side by side for comparison.
+
+## Key Components:
+
+- X-axis (or Y-axis for horizontal bars): Represents the categories.
+- Y-axis (or X-axis for horizontal bars): Represents the values or frequency.
+- Bars: Show the magnitude of the data for each category.
+- Labels & Title: Improve clarity and interpretation.
+
+## Uses:
+
+- Comparing values across categories.
+- Showing trends over time (if categories are time-based).
+- Visualizing frequencies or counts in survey or research data.
+
+## Advantages:
+
+- Simple and easy to interpret.
+- Effective for comparing data across categories.
+
+## Disadvantages:
+
+- Not ideal for displaying continuous data.
+- Can become cluttered with too many categories.
+
+## 1. Let us take a quick example.
+
+- Using Base R for Quick Plots
+
+Sample data
+
+```{r}
+data <- data.frame(
+  Category = c("A", "B", "C", "D"),
+  Value = c(10, 23, 17, 35)
+)
+
+```
+
+Bar Plot
+
+```{r}
+barplot(data$Value, names.arg = data$Category, 
+        col = "skyblue", main = "Base R Bar Plot", ylab = "Value")
+
+```
+
+
+## 2. Another example of a bar plot
+
+```{r}
+ggplot(data, aes(x = Category, y = Value, fill = Category)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "ggplot2 Bar Plot", y = "Value")
+
+```
+
+## 3. Basic Bar Plot – Base R
+
+Plotting the count of cars by the number of cylinders (cyl).
+Displays how many cars have 4, 6, or 8 cylinders.
+
+Load mtcars dataset
+
+```{r}
+data(mtcars)
+
+```
+
+Convert 'cyl' to a factor
+
+```{r}
+mtcars$cyl <- as.factor(mtcars$cyl)
+
+```
+
+Create a frequency table for cylinders
+
+```{r}
+cyl_counts <- table(mtcars$cyl)
+
+```
+
+Base R Bar Plot
+
+```{r}
+barplot(cyl_counts,
+        main = "Number of Cars by Cylinders",
+        xlab = "Number of Cylinders",
+        ylab = "Count of Cars",
+        col = c("skyblue", "salmon", "lightgreen"),
+        border = "black")
+
+```
+
+## 4. Bar Plot Using ggplot2
+
+Bar plot showing counts with ggplot2.
+
+```{r}
+ggplot(mtcars, aes(x = cyl, fill = cyl)) +
+  geom_bar() +
+  labs(title = "Count of Cars by Number of Cylinders",
+       x = "Number of Cylinders", y = "Count of Cars") +
+  scale_fill_manual(values = c("skyblue", "salmon", "lightgreen")) +
+  theme_minimal()
+
+```
+
+## 5. Stacked Bar Plot
+
+See how automatic and manual cars are distributed within each cylinder category.
+
+Visualizing the number of cylinders stacked by the type of transmission (am).
+
+Convert 'am' to a factor (0 = Automatic, 1 = Manual)
+
+```{r}
+mtcars$am <- factor(mtcars$am, labels = c("Automatic", "Manual"))
+
+```
+
+Stacked Bar Plot
+
+```{r}
+ggplot(mtcars, aes(x = cyl, fill = am)) +
+  geom_bar(position = "stack") +
+  labs(title = "Cylinders by Transmission Type",
+       x = "Number of Cylinders", y = "Count of Cars") +
+  scale_fill_manual(values = c("lightblue", "orange")) +
+  theme_light()
+
+```
+
+## 6. Grouped (Dodged) Bar Plot
+
+Separate bars for each transmission type.
+
+Easy to compare the number of manual vs. automatic cars within each cylinder group.
+
+```{r}
+ggplot(mtcars, aes(x = cyl, fill = am)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Cylinders by Transmission Type (Grouped)",
+       x = "Number of Cylinders", y = "Count of Cars") +
+  scale_fill_manual(values = c("lightblue", "orange")) +
+  theme_classic()
+
+```
+
+## 7. Horizontal Bar Plot
+
+```{r}
+ggplot(mtcars, aes(x = cyl, fill = cyl)) +
+  geom_bar() +
+  coord_flip() +  # Flips the axes
+  labs(title = "Horizontal Bar Plot: Cars by Cylinders",
+       x = "Count of Cars", y = "Number of Cylinders") +
+  theme_minimal()
+
+```
+
+
+# Box Plot
+
+A box plot (or box-and-whisker plot) is a standardized way of displaying the distribution of data based on a five-number summary: Minimum, First Quartile (Q1), Median (Q2), Third Quartile (Q3), and Maximum. It is especially useful for identifying outliers, spread, and central tendency in a dataset.
+
+## Key Components of a Box Plot:
+
+1. Box (Interquartile Range - IQR):
+
+- Represents the middle 50% of the data.
+- Lower Bound (Q1 - 25th percentile): The median of the lower half.
+- Upper Bound (Q3 - 75th percentile): The median of the upper half.
+- IQR = Q3 - Q1 → Measures data spread.
+
+2. Median (Q2 - 50th percentile):
+
+- Shown as a horizontal line inside the box.
+- Indicates the central tendency of the data.
+
+3. Whiskers:
+
+- Extend from the box to the smallest and largest data points within 1.5 × IQR from Q1 and Q3.
+- They help to visualize the overall range of the dataset.
+
+4. Outliers:
+
+- Data points lying outside the whiskers (beyond 1.5 × IQR).
+- Displayed as dots or asterisks.
+
+5. Minimum & Maximum:
+
+The lowest and highest data points within the whiskers.
+
+## How to Interpret a Box Plot:
+
+1. Median Position:
+
+- If the median is centered, the data is symmetric.
+- If the median is closer to Q1 or Q3, it indicates skewness.
+
+2. Spread of Data (IQR):
+
+- A wider box suggests more variability.
+- A narrow box indicates less spread.
+
+3. Skewness:
+
+- Right-skewed (positive skew) → longer upper whisker.
+- Left-skewed (negative skew) → longer lower whisker.
+
+Outliers:
+
+- Indicates unusual data points that may need further investigation.
+
+## Advantages of Box Plots:
+
+Easy to compare distributions between groups.
+Summarizes data spread, central tendency, and outliers.
+Useful for large datasets.
+
+## Limitations:
+
+- Does not show the distribution's exact shape (e.g., bimodality).
+- Less informative for small datasets.
+
+## 1. Using Base R (boxplot())
+
+Sample data
+
+```{r}
+radd <- data.frame(
+  Group = rep(c("A", "B", "C"), each = 20),
+  Value = c(rnorm(20, mean = 5), rnorm(20, mean = 7), rnorm(20, mean = 6))
+)
+
+```
+
+Create boxplot
+
+```{r}
+boxplot(Value ~ Group, data = radd,
+        main = "Boxplot Example (Base R)",
+        xlab = "Group",
+        ylab = "Value",
+        col = c("skyblue", "salmon", "lightgreen"),
+        border = "black")
+
+```
+
+## 2. Using ggplot2 for Enhanced Visualization
+
+Sample data
+
+```{r}
+datas <- data.frame(
+  Group = rep(c("A", "B", "C"), each = 20),
+  Value = c(rnorm(20, mean = 5), rnorm(20, mean = 7), rnorm(20, mean = 6))
+)
+
+```
+
+Create boxplot
+
+```{r}
+ggplot(datas, aes(x = Group, y = Value, fill = Group)) +
+  geom_boxplot() +
+  labs(title = "Boxplot Example (ggplot2)",
+       x = "Group", y = "Value") +
+  theme_minimal()
+
+```
+
+## 3. Boxplot of Miles per Gallon (mpg) by Number of Cylinders (cyl) – Base R
+
+Compare fuel efficiency across cars with 4, 6, and 8 cylinders.
+Cars with 4 cylinders generally have higher MPG.
+
+Load mtcars dataset
+
+```{r}
+data(mtcars)
+
+```
+
+Convert 'cyl' to a factor for categorical plotting
+
+```{r}
+mtcars$cyl <- as.factor(mtcars$cyl)
+
+```
+
+Base R Boxplot
+
+```{r}
+boxplot(mpg ~ cyl, data = mtcars,
+        main = "MPG by Number of Cylinders",
+        xlab = "Number of Cylinders",
+        ylab = "Miles Per Gallon (MPG)",
+        col = c("lightblue", "salmon", "lightgreen"),
+        border = "black")
+
+```
+
+## 4. Enhanced Boxplot Using ggplot2
+
+Load ggplot2 library
+
+ggplot2 Boxplot
+
+```{r}
+ggplot(mtcars, aes(x = cyl, y = mpg, fill = cyl)) +
+  geom_boxplot() +
+  labs(title = "MPG by Number of Cylinders (ggplot2)",
+       x = "Number of Cylinders",
+       y = "Miles Per Gallon (MPG)") +
+  scale_fill_manual(values = c("skyblue", "salmon", "lightgreen")) +
+  theme_minimal()
+
+```
+
+## 5. Adding Outliers & Jitter for Better Data Spread
+
+Outliers are in red.
+Jittered points show the exact data distribution.
+
+```{r}
+ggplot(mtcars, aes(x = cyl, y = mpg, fill = cyl)) +
+  geom_boxplot(outlier.color = "red", outlier.shape = 16, outlier.size = 2) +
+  geom_jitter(width = 0.2, alpha = 0.6) +  # Adds data points
+  labs(title = "MPG by Number of Cylinders with Outliers Highlighted",
+       x = "Number of Cylinders", y = "MPG") +
+  scale_fill_manual(values = c("skyblue", "salmon", "lightgreen")) +
+  theme_light()
+
+```
+
+## 6. Horizontal Boxplot Example
+
+```{r}
+ggplot(mtcars, aes(y = mpg, x = cyl, fill = cyl)) +
+  geom_boxplot() +
+  coord_flip() +  # Flips axes
+  labs(title = "Horizontal Boxplot: MPG by Cylinders",
+       x = "Number of Cylinders", y = "MPG") +
+  theme_classic()
+
+```
+
+
+# Line Plot
+
+A line plot (or line graph) is a type of chart used to display data points connected by straight lines. It is commonly used to show trends over time, continuous data, or relationships between variables.
+
+## Key Features of a Line Plot:
+
+1. Axes:
+
+- X-axis usually represents time or independent variables.
+- Y-axis shows the dependent variable or the data being measured.
+
+2. Data Points:
+
+- Individual data values plotted as points on the graph.
+
+3. Connecting Lines:
+
+Straight lines connect data points to highlight trends and changes.
+
+4. When to Use a Line Plot:
+
+- To show trends over time (e.g., sales over months).
+- To compare multiple data series.
+- To analyze patterns, fluctuations, or seasonality.
+
+5. dvantages:
+
+- Simple and easy to interpret.
+- Effective for showing continuous data.
+- Useful for identifying trends, spikes, and declines.
+
+6. Limitations:
+
+- Not ideal for large datasets with many fluctuations.
+- Can be misleading if scales are inconsistent.
+
+## 1. Example of Line plot
+
+```{r}
+df <- data.frame(Time = 1:10, Measurement = cumsum(rnorm(10)))
+ggplot(df, aes(x = Time, y = Measurement)) +
+  geom_line(color = "blue", size = 1.2) +
+  labs(title = "Line Plot", x = "Time", y = "Measurement") +
+  theme_light()
+
+```
+
+## 2. Basic Line Graph – Base R
+
+Plotting mpg (miles per gallon) as a function of car index (just the row number) in mtcars.
+
+Load mtcars dataset
+
+```{r}
+data(mtcars)
+
+```
+
+Basic Line Graph in Base R
+This graph shows MPG against the car index (row number), connecting the data points to show the trend.
+
+```{r}
+plot(mtcars$mpg, type = "o", col = "blue", 
+     main = "Miles per Gallon (MPG) by Car Index",
+     xlab = "Car Index (Row Number)", ylab = "Miles per Gallon (MPG)",
+     pch = 16, lwd = 2)
+
+```
+
+
+## 3. Line Graph Using ggplot2
+
+Plotting mpg versus hp (horsepower) as a line graph.
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_line(color = "blue", size = 1) +
+  labs(title = "MPG vs Horsepower", x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  theme_minimal()
+
+```
+
+## 4. Line Graph with Multiple Series Using ggplot2
+
+Plotting mpg versus hp with different lines for number of cylinders (cyl).
+Each cylinder group (4, 6, or 8 cylinders) is represented by a different line with a distinct color.
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg, color = factor(cyl))) +
+  geom_line(size = 1) +
+  labs(title = "MPG vs Horsepower by Number of Cylinders",
+       x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  scale_color_manual(values = c("red", "green", "blue")) +
+  theme_minimal()
+
+```
+
+## 5. Adding Points to the Line Graph Using ggplot2
+
+Plotting mpg as a function of hp and adding data points.
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_line(color = "blue", size = 1) +
+  geom_point(color = "red", size = 3) +
+  labs(title = "MPG vs Horsepower with Data Points",
+       x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  theme_light()
+
+```
+
+## 6. Smooth Line (Trend Line)
+
+Adding a smoothed line to visualize trends more clearly.
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(color = "red", size = 3) +
+  geom_smooth(method = "loess", color = "blue", size = 1) +
+  labs(title = "MPG vs Horsepower with Trend Line",
+       x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  theme_minimal()
+
+```
+
+
+# Scatter Plot
+
+A scatter plot (or scatter chart) is a type of graph used to represent the relationship between two continuous variables. Each point on the graph represents an observation in the dataset, with the position on the X-axis and Y-axis corresponding to the values of the variables.
+
+## Key Features of a Scatter Plot:
+
+1. Axes:
+
+- X-axis represents one variable (independent variable).
+- Y-axis represents the second variable (dependent variable).
+
+2. Data Points:
+
+- Each point on the graph represents a single data point, plotted according to its x and y values.
+
+3. Trend/Relationship:
+
+- Scatter plots help identify patterns, relationships, and correlations between the two variables (e.g., linear, non-linear, or no relationship).
+
+4. When to Use a Scatter Plot:
+
+- To explore the relationship between two continuous variables (e.g., height and weight, age and income).
+- To visually check for correlation (positive, negative, or none).
+- To identify outliers and clusters in the data.
+
+5. dvantages:
+
+- Simple and effective for displaying the relationship between two variables.
+- Helps to easily spot correlation patterns, outliers, and trends.
+- Great for visualizing large datasets.
+
+6. Limitations:
+
+- May become cluttered with large datasets.
+- Cannot be used for categorical data directly.
+- Doesn’t provide information on causality—just correlation.
+
+7. Types of Patterns in a Scatter Plot:
+
+- Positive Correlation: Points tend to rise as you move right (e.g., height and weight).
+- Negative Correlation: Points tend to fall as you move right (e.g., income vs. unemployment rate).
+- No Correlation: No discernible pattern or trend (e.g., shoe size vs. IQ).
+- Curvilinear Relationship: A curved or U-shape pattern.
+
+8. Outliers: 
+
+- Data points that are distant from others, indicating unusual values.
+
+9. Tips for Effective Scatter Plots:
+
+- Use color or size to represent additional variables.
+- Add a trend line or regression line to summarize relationships.
+- Ensure axis scales are appropriate to avoid misleading interpretations.
+
+## 1. Scatter Plot with Trend Line
+
+```{r}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = "darkgreen") +
+  geom_smooth(method = "lm", col = "red") +
+  labs(title = "MPG vs Weight", x = "Weight", y = "Miles Per Gallon")
+  
+```
+
+## 2. Basic Scatter Plot – Base R
+
+Plotting mpg (miles per gallon) against hp (horsepower) in mtcars.
+
+Load mtcars dataset
+
+```{r}
+data(mtcars)
+
+```
+
+Basic Scatter Plot in Base R
+The scatter plot shows the relationship between horsepower and miles per gallon.
+
+```{r}
+plot(mtcars$hp, mtcars$mpg, 
+     main = "Scatter Plot of MPG vs Horsepower",
+     xlab = "Horsepower", ylab = "Miles per Gallon (MPG)",
+     pch = 19, col = "blue")
+
+```
+
+## 3. Scatter Plot Using ggplot2
+
+Plotting mpg versus hp with custom styling using ggplot2.
+
+ggplot2 Scatter Plot
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(color = "blue", size = 3) +
+  labs(title = "Scatter Plot of MPG vs Horsepower", x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  theme_minimal()
+
+```
+
+## 4. Scatter Plot with Color Grouping by Cylinders
+
+Points are colored based on the number of cylinders (4, 6, 8 cylinders).
+Each group (cylinder type) has a different color for better distinction.
+
+Scatter plot of mpg vs hp, where points are colored by the number of cylinders (cyl).
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(title = "MPG vs Horsepower by Number of Cylinders", x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  scale_color_manual(values = c("red", "green", "blue")) +
+  theme_light()
+
+```
+
+## 5. Scatter Plot with Smooth Trend Line
+
+Adding a smooth trend line to the scatter plot to visualize the relationship.
+The red trend line (linear regression) helps show the overall relationship between horsepower and MPG.
+
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(color = "blue", size = 3) +
+  geom_smooth(method = "lm", color = "red", size = 1) +
+  labs(title = "MPG vs Horsepower with Linear Trend Line", x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  theme_minimal()
+
+```
+
+## 6. Scatter Plot with Jitter for Overlapping Points
+
+Using jitter to add noise to overlapping points for better visibility.
+Jittering helps separate points that are clustered in the same spot, especially when multiple cars have the same mpg or hp values.
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_jitter(color = "blue", size = 3, width = 0.2, height = 0.2) +
+  labs(title = "MPG vs Horsepower with Jitter", x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  theme_minimal()
+
+```
+
+## 7. Adding a Regression Line with Confidence Interval
+
+Adding a regression line with the confidence interval to the scatter plot.
+Confidence interval (shaded area around the red line) shows the range within which the true regression line is expected to fall.
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(color = "blue", size = 3) +
+  geom_smooth(method = "lm", se = TRUE, color = "red", size = 1) +
+  labs(title = "MPG vs Horsepower with Regression Line and Confidence Interval",
+       x = "Horsepower", y = "Miles per Gallon (MPG)") +
+  theme_minimal()
+
+```
+
+# Conclusion
+
+In this tutorial, we explored different methods for visualizing data in R.
+We started with basic plotting techniques in Base R and then moved to more advanced visualizations using ggplot2.
+
+Base R plots like bar plots, scatter plots, histograms, and boxplots provide a quick way to visualize data and can be useful for exploratory data analysis.
+
+ggplot2 allows for more refined and customizable visualizations. It provides a wide range of functionalities such as regression lines, faceting, and aesthetics, which help present data in a more clear and insightful manner.
+
+
+
+
+
+
+
+
+
+
+
+
+

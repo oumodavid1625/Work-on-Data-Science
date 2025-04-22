@@ -1,0 +1,349 @@
+---
+title: "Data Manipulation_pdf"
+author: "Oumo David"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+This is a tutorial on data manipulation in R using the mtcars dataset. 
+This example covers common data manipulation tasks such as filtering, sorting, grouping, summarizing, and creating new variables.
+
+# Load the Dataset
+The mtcars dataset is included in R by default. You can load it using the data() function.
+
+View the first few rows of the dataset
+
+
+```{r}
+data("mtcars")
+
+head(mtcars)
+
+```
+
+# Basic Data Manipulations
+
+## 1. Filter Rows
+Filter the dataset to include only cars with more than 6 cylinders.
+
+```{r}
+library(dplyr)
+
+filtered_data <- mtcars %>%
+  filter(cyl > 6)
+
+head(filtered_data)
+
+```
+
+## 2. Select Columns
+Select specific columns (e.g., mpg, cyl, hp).
+
+```{r}
+selected_data <- mtcars %>%
+  select(mpg, cyl, hp)
+
+head(selected_data)
+
+```
+
+## 3. Sort Data
+Sort the dataset by mpg (miles per gallon) in descending order.
+
+```{r}
+sorted_data <- mtcars %>%
+  arrange(desc(mpg))
+
+head(sorted_data)
+
+```
+
+## 4. Create New Variables
+Add a new column kmpl (kilometers per liter) by converting mpg to kilometers per liter (1 mpg ≈ 0.425 kmpl).
+
+```{r}
+mutated_data <- mtcars %>%
+  mutate(kmpl = mpg * 0.425)
+
+head(mutated_data)
+
+```
+
+## 5. Group and Summarize
+Group the data by cyl (number of cylinders) and calculate the mean mpg for each group.
+
+```{r}
+summary_data <- mtcars %>%
+  group_by(cyl) %>%
+  summarize(mean_mpg = mean(mpg),
+            max_hp = max(hp))
+
+print(summary_data)
+
+```
+
+## 6. Rename Columns
+Rename the mpg column to miles_per_gallon.
+
+```{r}
+renamed_data <- mtcars %>%
+  rename(miles_per_gallon = mpg)
+
+head(renamed_data)
+
+```
+
+## 7. Add Row Numbers
+Add a new column with row numbers.
+
+```{r}
+row_numbered_data <- mtcars %>%
+  mutate(row_num = row_number())
+
+head(row_numbered_data)
+
+```
+
+# Advanced Data Manipulations
+
+## 1. Merge with Another Dataset
+Create a small dataset and merge it with mtcars.
+
+Create a small dataset
+
+```{r}
+car_names <- data.frame(
+  car = rownames(mtcars),
+  brand = c("Toyota", "Ford", "Mazda", "Honda", "Datsun", "Chrysler", "AMC", "Pontiac", "Fiat", "Porsche", "Lotus", "Ford", "Chevrolet", "Cadillac", "Lincoln", "Dodge", "Merc", "Valiant", "Duster", "Merc", "Merc", "Merc", "Merc", "Merc", "Merc", "Merc", "Merc", "Merc", "Merc", "Merc", "Merc", "Merc")
+)
+
+```
+
+Merge with mtcars
+
+```{r}
+merged_data <- mtcars %>%
+  mutate(car = rownames(mtcars)) %>%
+  left_join(car_names, by = "car")
+
+head(merged_data)
+
+```
+
+## 2. Pivot Data
+Reshape the data from wide to long format using pivot_longer.
+
+```{r}
+library(tidyr)
+
+long_data <- mtcars %>%
+  pivot_longer(cols = c(mpg, hp, wt), 
+               names_to = "metric", 
+               values_to = "value")
+
+head(long_data)
+
+```
+
+## 3. Handle Missing Data
+Add some missing values and handle them.
+
+Introduce missing values
+
+```{r}
+mtcars_with_na <- mtcars
+mtcars_with_na[1:5, "mpg"] <- NA
+
+```
+
+Remove rows with missing values
+
+```{r}
+cleaned_data <- mtcars_with_na %>%
+  drop_na(mpg)
+
+head(cleaned_data)
+
+```
+
+# Data visualization
+
+Data visualization is a crucial part of data analysis, and R provides powerful tools like ggplot2 and base R plotting functions to create insightful visualizations. 
+We will demonstrate various types of visualizations using the mtcars dataset.
+
+Load necessary libraries
+
+```{r}
+library(ggplot2)
+
+```
+
+## 1. Scatter Plot
+Visualize the relationship between two numeric variables, such as mpg (miles per gallon) and wt (weight).
+We shall make a Scatter plot using ggplot2
+
+```{r, fig.cap="Figure 1: The relationship between the weight of the motor vehicle and the miles per gallon"}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = "blue", size = 3) +
+  labs(title = "Scatter Plot of MPG vs Weight",
+       x = "Weight (1000 lbs)",
+       y = "Miles per Gallon") +
+  theme_minimal()
+
+```
+
+## 2. Box Plot
+Compare the distribution of mpg across different numbers of cylinders (cyl).
+Let us make a Box plot using ggplot2
+
+```{r}
+ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
+  geom_boxplot() +
+  labs(title = "Box Plot of MPG by Cylinders",
+       x = "Number of Cylinders",
+       y = "Miles per Gallon") +
+  theme_minimal()
+
+```
+
+
+## 3. Bar Plot
+Visualize the average mpg for each number of cylinders.
+Here, we shall create a Bar plot using ggplot2
+
+```{r}
+avg_mpg <- mtcars %>%
+  group_by(cyl) %>%
+  summarize(mean_mpg = mean(mpg))
+
+ggplot(avg_mpg, aes(x = factor(cyl), y = mean_mpg, fill = factor(cyl))) +
+  geom_bar(stat = "identity") +
+  labs(title = "Average MPG by Cylinders",
+       x = "Number of Cylinders",
+       y = "Average Miles per Gallon") +
+  theme_minimal()
+
+```
+
+## 4. Histogram
+Visualize the distribution of mpg.
+Let us create a Histogram using ggplot2
+
+```{r}
+ggplot(mtcars, aes(x = mpg)) +
+  geom_histogram(binwidth = 2, fill = "orange", color = "black") +
+  labs(title = "Histogram of MPG",
+       x = "Miles per Gallon",
+       y = "Frequency") +
+  theme_minimal()
+
+```
+
+## 5. Density Plot
+Visualize the density distribution of mpg.
+Let us make a Density plot using ggplot2
+
+```{r}
+ggplot(mtcars, aes(x = mpg)) +
+  geom_density(fill = "lightblue", alpha = 0.5) +
+  labs(title = "Density Plot of MPG",
+       x = "Miles per Gallon",
+       y = "Density") +
+  theme_minimal()
+
+```
+
+## 6. Line Plot
+Visualize the relationship between mpg and hp (horsepower) using a line plot.
+Here, we shall make a Line plot using ggplot2
+
+```{r}
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_line(color = "red") +
+  labs(title = "Line Plot of MPG vs Horsepower",
+       x = "Horsepower",
+       y = "Miles per Gallon") +
+  theme_minimal()
+
+```
+
+## 7. Heatmap
+Visualize correlations between numeric variables in the dataset.
+Let us make a Heatmap using base R
+
+```{r}
+correlation_matrix <- cor(mtcars)
+heatmap(correlation_matrix, 
+        col = colorRampPalette(c("blue", "white", "red"))(100),
+        main = "Correlation Heatmap of mtcars Dataset")
+
+```
+
+## 8. Faceted Plot
+Compare mpg vs wt for different numbers of cylinders using facets.
+Making a Faceted plot using ggplot2
+
+```{r}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = "purple") +
+  facet_wrap(~ cyl) +
+  labs(title = "Faceted Scatter Plot of MPG vs Weight by Cylinders",
+       x = "Weight (1000 lbs)",
+       y = "Miles per Gallon") +
+  theme_minimal()
+
+```
+
+## 9. Violin Plot
+Visualize the distribution of mpg across different numbers of cylinders.
+Let us make a Violin plot using ggplot2
+
+```{r}
+ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
+  geom_violin() +
+  labs(title = "Violin Plot of MPG by Cylinders",
+       x = "Number of Cylinders",
+       y = "Miles per Gallon") +
+  theme_minimal()
+
+```
+
+## 10. Pair Plot
+Visualize pairwise relationships between numeric variables.
+Making a Pair plot using base R
+
+```{r}
+pairs(mtcars[, 1:5], 
+      main = "Pair Plot of mtcars Dataset",
+      pch = 19, 
+      col = "darkblue")
+
+```
+
+## 11. Custom Theme
+Customize the theme of your plots for better aesthetics.
+
+Custom theme
+
+```{r}
+custom_theme <- theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    legend.position = "bottom"
+  )
+
+```
+
+Example plot with custom theme
+
+```{r}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = "green", size = 3) +
+  labs(title = "Custom Themed Scatter Plot",
+       x = "Weight (1000 lbs)",
+       y = "Miles per Gallon") +
+  custom_theme
+
+```
